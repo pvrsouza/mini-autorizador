@@ -1,5 +1,6 @@
 package br.com.desafiovr.miniautorizador.controllers;
 
+import br.com.desafiovr.miniautorizador.exceptions.CartaoExistenteException;
 import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import br.com.desafiovr.miniautorizador.service.CartaoService;
@@ -20,7 +21,7 @@ public class CartaoController {
     }
 
     @PostMapping
-    public ResponseEntity<CartaoResponseDto> create(@RequestBody CartaoRequestDto cartaoRequest) {
+    public ResponseEntity<CartaoResponseDto> create(@RequestBody CartaoRequestDto cartaoRequest) throws CartaoExistenteException {
         CartaoResponseDto cartao = this.cartaoService.create(cartaoRequest);
         return new ResponseEntity<>(cartao, HttpStatus.CREATED);
     }
