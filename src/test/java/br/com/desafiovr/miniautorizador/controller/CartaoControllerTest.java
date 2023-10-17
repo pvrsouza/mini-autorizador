@@ -4,7 +4,6 @@ import br.com.desafiovr.miniautorizador.controllers.CartaoController;
 import br.com.desafiovr.miniautorizador.exceptions.CartaoExistenteException;
 import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
 import br.com.desafiovr.miniautorizador.service.CartaoServiceImpl;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ public class CartaoControllerTest {
     @Test
     void Deve_CriarCartao_ComSucesso() throws Exception {
 
-        CartaoRequestDto cartaoRequest = buildCartao();
+        CartaoRequestDto cartaoRequest = buildCartaoRequestValido();
 
         when(cartaoService.create(cartaoRequest)).thenReturn(cartaoRequest.toResponseDto());
 
@@ -60,27 +59,57 @@ public class CartaoControllerTest {
     @Test
     void NaoDeve_CriarCartao_Quando_NumeroCartaoJaEstiverCadastrado() throws Exception {
 
-        CartaoRequestDto cartaoRequest = buildCartao();
+        CartaoRequestDto requestValida = buildCartaoRequestValido();
 
-        when(cartaoService.create(cartaoRequest)).thenThrow(new CartaoExistenteException(cartaoRequest.toResponseDto(),HttpStatus.UNPROCESSABLE_ENTITY ));
+        when(cartaoService.create(requestValida)).thenThrow(new CartaoExistenteException(requestValida.toResponseDto(),HttpStatus.UNPROCESSABLE_ENTITY ));
 
-        String json = cartaoRequest.toJson();
+        String json = requestValida.toJson();
         mvc.perform(post(BASE_PATH)
                         .content(json)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()))
-                .andExpect(jsonPath("$.numeroCartao").value(cartaoRequest.getNumeroCartao()))
-                .andExpect(jsonPath("$.senha").value(cartaoRequest.getSenha()))
+                .andExpect(jsonPath("$.numeroCartao").value(requestValida.getNumeroCartao()))
+                .andExpect(jsonPath("$.senha").value(requestValida.getSenha()))
+        ;
+    }
+
+    @Test
+    void NaoDeve_CriarCartao_Quando_NaoAtenderAosCriteriosDeValidacaoDoInputRequest() throws Exception {
+
+        CartaoRequestDto requestInvalida = buildCartaoRequestInvalido();
+
+
+        String json = requestInvalida.toJson();
+        mvc.perform(post(BASE_PATH)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.codigo").value("3"))
+                .andExpect(jsonPath("$.descricao").isNotEmpty())
         ;
     }
 
 
-    private static CartaoRequestDto buildCartao() {
+    private static CartaoRequestDto buildCartaoRequestValido() {
         return CartaoRequestDto.builder()
                 .senha("123456")
-                .numeroCartao("12")
+                .numeroCartao("1234567890123456")
+                .build();
+    }
+
+
+    /**
+     * Retorna um cartão inválido para testes com dados menores do que os exigidos
+     * @return
+     */
+    private static CartaoRequestDto buildCartaoRequestInvalido() {
+        return CartaoRequestDto.builder()
+                .senha("1")
+                .numeroCartao("1")
                 .build();
     }
 
