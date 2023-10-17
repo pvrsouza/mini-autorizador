@@ -3,6 +3,9 @@ package br.com.desafiovr.miniautorizador.model.entity;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -23,6 +26,14 @@ public class Cartao {
 
     @Column(name="senha", nullable = false)
     private String senha;
+
+    @Column(name="saldo", nullable = false)
+    private BigDecimal saldo;
+
+    @PrePersist
+    public void prePersist() {
+        saldo = new BigDecimal(500);
+    }
 
     public CartaoResponseDto toResponseDto(){
         return CartaoResponseDto.builder()

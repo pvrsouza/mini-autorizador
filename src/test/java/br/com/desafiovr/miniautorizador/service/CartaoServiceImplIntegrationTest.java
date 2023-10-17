@@ -3,6 +3,7 @@ package br.com.desafiovr.miniautorizador.service;
 import br.com.desafiovr.miniautorizador.exceptions.CartaoExistenteException;
 import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
+import br.com.desafiovr.miniautorizador.model.entity.Cartao;
 import br.com.desafiovr.miniautorizador.repository.CartaoRepository;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -62,6 +65,25 @@ public class CartaoServiceImplIntegrationTest {
         CartaoResponseDto cartaoResponseDto = cartaoService.create(cartaoRequestDto);
 
         assertEquals(1, cartaoRepository.count());
+
+    }
+
+    @Test
+    public void Deve_InserirSaldoDefault_Quando_CriarCartao() throws Exception{
+
+        final BigDecimal saldoInicialParaCartoesNovos = new BigDecimal(500);
+
+        CartaoRequestDto cartaoRequestDto = CartaoRequestDto.builder()
+                .numeroCartao("1234567890123456")
+                .senha("123456")
+                .build();
+
+        CartaoResponseDto cartaoResponseDto = cartaoService.create(cartaoRequestDto);
+
+        Cartao cartaoPersistido = this.cartaoRepository.findByNumeroCartao(cartaoRequestDto.getNumeroCartao());
+
+        assertNotNull(cartaoPersistido);
+        assertEquals(saldoInicialParaCartoesNovos, cartaoPersistido.getSaldo());
 
     }
 
