@@ -3,6 +3,7 @@ package br.com.desafiovr.miniautorizador.controller;
 import br.com.desafiovr.miniautorizador.controllers.CartaoController;
 import br.com.desafiovr.miniautorizador.exceptions.CartaoExistenteException;
 import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
+import br.com.desafiovr.miniautorizador.repository.CartaoRepository;
 import br.com.desafiovr.miniautorizador.service.CartaoServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,9 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,6 +38,7 @@ public class CartaoControllerTest {
     CartaoServiceImpl cartaoService;
 
     private static final String BASE_PATH = "/cartoes";
+    private static final String SALDO_PATH = "/{numeroCartao}";
 
 
     @Test
@@ -88,9 +93,27 @@ public class CartaoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.codigo").value("3"))
                 .andExpect(jsonPath("$.descricao").isNotEmpty())
         ;
+    }
+
+    @Test
+    void Deve_Obter_SaldoCartao() throws Exception {
+
+        String numeroCartao = "1234567890123456";
+        String saldoCartao = "500.00";
+
+        when(this.cartaoService.getSaldo(numeroCartao)).thenReturn(saldoCartao);
+
+        MvcResult result = mvc.perform(get(BASE_PATH + SALDO_PATH, numeroCartao)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+
+        assertEquals(saldoCartao, content);
     }
 
 

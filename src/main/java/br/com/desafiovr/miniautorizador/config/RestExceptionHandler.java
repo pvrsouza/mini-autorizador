@@ -1,6 +1,7 @@
 package br.com.desafiovr.miniautorizador.config;
 
 import br.com.desafiovr.miniautorizador.exceptions.CartaoExistenteException;
+import br.com.desafiovr.miniautorizador.exceptions.CartaoNotFoundException;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import br.com.desafiovr.miniautorizador.model.dto.output.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,6 @@ public class RestExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleBusinessException(Exception ex, WebRequest request) {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .codigo("99")
                 .descricao("Ocorreu um erro inesperado. Entre em contato com o suporte técnico")
                 .build();
         return handleExceptionInternal(ex, errorResponse , HttpStatus.INTERNAL_SERVER_ERROR);
@@ -39,6 +39,14 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(ex.getCartaoResponseDto(), ex.getHttpStatus());
     }
 
+    @ExceptionHandler(value = {CartaoNotFoundException.class})
+    protected ResponseEntity<ErrorResponse> handleCartaoNotFoundException(CartaoNotFoundException ex, WebRequest request) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .descricao(ex.getMessage())
+                .build();
+        return handleExceptionInternal(ex, errorResponse, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handle(MethodArgumentNotValidException ex, WebRequest request){
         BindingResult bindingResult = ex.getBindingResult();
@@ -46,7 +54,6 @@ public class RestExceptionHandler {
                 .map(f -> f.getField().concat(": ").concat(Optional.ofNullable(f.getDefaultMessage()).orElse("")))
                 .collect(Collectors.joining(" | "));
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .codigo("3")
                 .descricao(errorMsg)
                 .build();
 

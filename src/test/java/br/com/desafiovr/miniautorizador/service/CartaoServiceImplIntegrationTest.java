@@ -5,7 +5,6 @@ import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import br.com.desafiovr.miniautorizador.model.entity.Cartao;
 import br.com.desafiovr.miniautorizador.repository.CartaoRepository;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,9 +17,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -78,12 +77,13 @@ public class CartaoServiceImplIntegrationTest {
                 .senha("123456")
                 .build();
 
-        CartaoResponseDto cartaoResponseDto = cartaoService.create(cartaoRequestDto);
+        cartaoService.create(cartaoRequestDto);
 
-        Cartao cartaoPersistido = this.cartaoRepository.findByNumeroCartao(cartaoRequestDto.getNumeroCartao());
+        Optional<Cartao> cartaoPersistido = this.cartaoRepository.findByNumeroCartao(cartaoRequestDto.getNumeroCartao());
 
         assertNotNull(cartaoPersistido);
-        assertEquals(saldoInicialParaCartoesNovos, cartaoPersistido.getSaldo());
+        assertTrue(cartaoPersistido.isPresent());
+        assertEquals(saldoInicialParaCartoesNovos, cartaoPersistido.get().getSaldo());
 
     }
 
@@ -101,6 +101,24 @@ public class CartaoServiceImplIntegrationTest {
         CartaoExistenteException exception = Assertions.assertThrows(CartaoExistenteException.class, () -> cartaoService.create(cartaoRequestDto));
 
         assertNotNull(exception);
+
+    }
+
+
+    @Test
+    public void Deve_Retornar_SaldoCartaoFormatado() throws Exception {
+        String numeroCartao = "1234567890123456";
+
+        // salva o cartão previamente
+        CartaoRequestDto cartaoRequestDto = CartaoRequestDto.builder()
+                .numeroCartao(numeroCartao)
+                .senha("123456")
+                .build();
+        cartaoService.create(cartaoRequestDto);
+
+        String saldoFormatado = cartaoService.getSaldo(numeroCartao);
+
+        assertEquals("500.00", saldoFormatado);
 
     }
 }

@@ -7,12 +7,20 @@ import br.com.desafiovr.miniautorizador.repository.CartaoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CartaoServiceUnitTest {
@@ -69,6 +77,38 @@ public class CartaoServiceUnitTest {
         assertEquals(cartaoEntity, cartaoArgumentCaptor.getValue());
         assertEquals(cartaoEntity.toResponseDto(), response);
 
+    }
+
+    @Test
+    public void Deve_Retornar_SaldoFormatado() throws Exception{
+        String numeroCartao = "1234567890123456";
+        String valorFormatado = "500.00";
+
+        Cartao cartao = buildCartaoValido(numeroCartao);
+        when(this.cartaoRepository.findByNumeroCartao(numeroCartao)).thenReturn(Optional.of(cartao));
+
+        String saldoFormatado = this.cartaoService.getSaldo(numeroCartao);
+        assertEquals(valorFormatado, saldoFormatado);
+    }
+
+    @Test
+    public void Deve_RetornarErro_Quando_TentarObterSaldoComParametroVazio() throws Exception{
+        String numeroCartao = "";
+
+        Cartao cartao = buildCartaoValido(numeroCartao);
+
+        Exception exception = Assertions.assertThrows(Exception.class, () -> this.cartaoService.getSaldo(numeroCartao));
+
+        assertNotNull(exception);
+    }
+
+    private static Cartao buildCartaoValido(String numeroCartao) {
+        return Cartao.builder()
+                .id(1L)
+                .numeroCartao(numeroCartao)
+                .senha("123456")
+                .saldo(new BigDecimal(500))
+                .build();
     }
 
 
