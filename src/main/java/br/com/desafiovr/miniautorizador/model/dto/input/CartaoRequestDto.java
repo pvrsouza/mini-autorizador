@@ -2,6 +2,7 @@ package br.com.desafiovr.miniautorizador.model.dto.input;
 
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import br.com.desafiovr.miniautorizador.model.entity.Cartao;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,5 +29,9 @@ public class CartaoRequestDto {
                 .numeroCartao(this.numeroCartao)
                 .senha(this.senha)
                 .build();
+    }
+
+    public String toJson(){
+        return new ObjectMapper().valueToTree(this).toString();
     }
 }
