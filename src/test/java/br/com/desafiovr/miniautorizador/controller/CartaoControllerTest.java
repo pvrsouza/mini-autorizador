@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CartaoController.class})
 @AutoConfigureMockMvc
-@Disabled("Desabilitado porque está dando erro de contexto ao executar o mvn test")
+//@Disabled("Desabilitado porque está dando erro de contexto ao executar o mvn test")
 public class CartaoControllerTest {
 
     @Autowired
