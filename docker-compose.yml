@@ -26,3 +26,6 @@ services:
       MYSQL_DATABASE: miniautorizador
       MYSQL_ROOT_PASSWORD:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - "./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql"
+    command: --init-file=/docker-entrypoint-initdb.d/1.sql
