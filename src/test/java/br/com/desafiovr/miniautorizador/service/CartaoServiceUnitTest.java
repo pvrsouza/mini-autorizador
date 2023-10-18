@@ -1,10 +1,11 @@
 package br.com.desafiovr.miniautorizador.service;
 
+import br.com.desafiovr.miniautorizador.exceptions.SaldoInsuficienteException;
+import br.com.desafiovr.miniautorizador.exceptions.SenhaInvalidaException;
 import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import br.com.desafiovr.miniautorizador.model.entity.Cartao;
 import br.com.desafiovr.miniautorizador.repository.CartaoRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,9 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +45,7 @@ public class CartaoServiceUnitTest {
         when(this.mensagensService.getNullPointerErrorMessage()).thenReturn(nullPointerErrorMessage);
 
         NullPointerException nullPointerException =
-                Assertions.assertThrows(
+                assertThrows(
                         NullPointerException.class,
                         () -> this.cartaoService.create(null)
                 );
@@ -97,9 +96,90 @@ public class CartaoServiceUnitTest {
 
         Cartao cartao = buildCartaoValido(numeroCartao);
 
-        Exception exception = Assertions.assertThrows(Exception.class, () -> this.cartaoService.getSaldo(numeroCartao));
+        Exception exception = assertThrows(Exception.class, () -> this.cartaoService.getSaldo(numeroCartao));
 
         assertNotNull(exception);
+    }
+
+    @Test
+    public void Deve_RetornarErro_Quando_TentarObterSaldoComParametroNulo() throws Exception{
+        String numeroCartao = null;
+
+        Exception exception = assertThrows(Exception.class,
+                () -> this.cartaoService.getSaldo(numeroCartao));
+
+        assertNotNull(exception);
+    }
+
+    @Test
+    public void Deve_ValidarSenha_Valida(){
+        String numeroCartao = "1234567890123456";
+        String senha = "123456";
+
+        Cartao cartao = buildCartaoValido(numeroCartao);
+        when(this.cartaoRepository.findByNumeroCartaoAndSenha(numeroCartao, senha))
+                .thenReturn(Optional.of(cartao));
+
+        this.cartaoService.validaSenha(numeroCartao, senha);
+    }
+
+    @Test
+    public void Deve_RetornarErro_Quando_ValidarSenhaInvalida(){
+        String numeroCartao = "1234567890123456";
+        String senha = "123456";
+
+        when(this.cartaoRepository.findByNumeroCartaoAndSenha(numeroCartao, senha))
+                .thenReturn(Optional.empty());
+
+        SenhaInvalidaException exception = assertThrows(SenhaInvalidaException.class,
+                () -> this.cartaoService.validaSenha(numeroCartao, senha));
+
+        assertNotNull(exception);
+    }
+    @Test
+    public void Deve_Validar_SaldoDisponivel(){
+
+        String numeroCartao = "1234567890123456";
+
+        Cartao cartaoValido = buildCartaoValido(numeroCartao);
+
+        when(cartaoRepository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, BigDecimal.ZERO))
+                .thenReturn(Optional.of(cartaoValido));
+
+        this.cartaoService.validaSaldoDisponivel(numeroCartao);
+
+    }
+
+
+    @Test
+    public void Deve_RetornarErro_Quando_CartaoNaoTiverSaldoDisponivel(){
+
+            String numeroCartao = "1234567890123456";
+
+            when(cartaoRepository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, BigDecimal.ZERO))
+                    .thenReturn(Optional.empty());
+
+            SaldoInsuficienteException exception = assertThrows(SaldoInsuficienteException.class,
+                    () -> this.cartaoService.validaSaldoDisponivel(numeroCartao));
+
+            assertNotNull(exception);
+
+    }
+
+
+    @Test
+    public void Deve_AtualizarSaldoCartao(){
+        String numeroCartao = "1234567890123456";
+        BigDecimal saldoNovo = new BigDecimal(1000);
+        Cartao cartao = buildCartaoValido(numeroCartao);
+
+        this.cartaoService.atualizaSaldo(cartao, saldoNovo);
+
+        verify(this.cartaoRepository).save(cartaoArgumentCaptor.capture());
+
+        Cartao cartaoArgumentCaptorValue = cartaoArgumentCaptor.getValue();
+        assertEquals(cartao, cartaoArgumentCaptorValue);
+        assertEquals(saldoNovo, cartaoArgumentCaptorValue.getSaldo());
     }
 
     private static Cartao buildCartaoValido(String numeroCartao) {

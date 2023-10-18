@@ -1,21 +1,21 @@
 package br.com.desafiovr.miniautorizador.model.dto.input;
 
-import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
-import br.com.desafiovr.miniautorizador.model.entity.Cartao;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartaoRequestDto {
+public class TransacaoRequestDto {
 
     @NotEmpty(message = "O campo número do cartão é obrigatório.")
     @Schema(description = "Campo que representa o número do cartão.", example = "123456789", required = true)
@@ -25,23 +25,9 @@ public class CartaoRequestDto {
     @NotEmpty(message = "O campo senha é obrigatório.")
     @Schema(description = "Campo que representa a senha do cartão.", example = "123456789", required = true)
     @Size(min = 4, message = "É necessário informar no mínimo 4 caracteres pra o número do cartão")
-    private String senha;
+    private String senhaCartao;
 
-    public Cartao toEntity() {
-        return Cartao.builder()
-                .numeroCartao(this.numeroCartao)
-                .senha(this.senha)
-                .build();
-    }
-
-    public CartaoResponseDto toResponseDto() {
-        return CartaoResponseDto.builder()
-                .numeroCartao(this.numeroCartao)
-                .senha(this.senha)
-                .build();
-    }
-
-    public String toJson(){
-        return new ObjectMapper().valueToTree(this).toString();
-    }
+    @NotNull(message = "O campo valor é obrigatório.")
+    @Schema(description = "Campo que representa a valor da transação.", example = "1321645.21", required = true)
+    private BigDecimal valor;
 }

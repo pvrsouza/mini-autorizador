@@ -2,6 +2,8 @@ package br.com.desafiovr.miniautorizador.service;
 
 import br.com.desafiovr.miniautorizador.exceptions.CartaoExistenteException;
 import br.com.desafiovr.miniautorizador.exceptions.CartaoNotFoundException;
+import br.com.desafiovr.miniautorizador.exceptions.SaldoInsuficienteException;
+import br.com.desafiovr.miniautorizador.exceptions.SenhaInvalidaException;
 import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import br.com.desafiovr.miniautorizador.model.entity.Cartao;
@@ -15,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -65,12 +68,49 @@ public class CartaoServiceImpl implements CartaoService {
         return cartao.getSaldo().setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
     }
 
-    private Cartao getCartao(String numeroCartao) throws CartaoNotFoundException {
+    public Cartao getCartao(String numeroCartao) throws CartaoNotFoundException {
 
         Assert.notNull(numeroCartao, this.mensagensService.getErrorMessage("error.cartao.numero.nulo"));
         Assert.isTrue(StringUtils.hasText(numeroCartao), this.mensagensService.getErrorMessage("error.cartao.numero.vazio"));
 
         return this.repository.findByNumeroCartao(numeroCartao)
                 .orElseThrow(() -> new CartaoNotFoundException(this.mensagensService.getErrorMessage("error.cartao.not.found", numeroCartao)));
+    }
+
+    @Override
+    public void validaSenha(String numeroCartao, String senha) throws SenhaInvalidaException {
+        this.repository.findByNumeroCartaoAndSenha(numeroCartao, senha).ifPresentOrElse(
+                c -> {
+                    log.info("Senha valida para o cartão {}", numeroCartao);
+                },
+                () -> {
+                    String errorMessage = this.mensagensService.getErrorMessage("error.cartao.senha.invalida");
+                    log.error(errorMessage);
+                    throw new SenhaInvalidaException(errorMessage);
+                }
+        );
+    }
+
+    @Override
+    public void validaSaldoDisponivel(String numeroCartao) throws SaldoInsuficienteException {
+        BigDecimal saldoZero = BigDecimal.ZERO;
+        Optional<Cartao> byNumeroCartaoAndSaldoGreaterThan = this.repository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, saldoZero);
+
+        byNumeroCartaoAndSaldoGreaterThan.ifPresentOrElse(
+                c -> {
+                    log.info("Saldo encontrado é maior que {} para o cartão de número {}", saldoZero, numeroCartao);
+                },
+                () -> {
+                    String errorMessage = this.mensagensService.getErrorMessage("error.cartao.saldo.insuficiente");
+                    log.error(errorMessage);
+                    throw new SaldoInsuficienteException(errorMessage);
+                }
+        );
+    }
+
+    @Override
+    public Cartao atualizaSaldo(Cartao cartao, BigDecimal resultado) {
+        cartao.setSaldo(resultado);
+        return this.repository.save(cartao);
     }
 }
