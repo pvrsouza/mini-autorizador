@@ -80,9 +80,7 @@ public class CartaoServiceImpl implements CartaoService {
     @Override
     public void validaSenha(String numeroCartao, String senha) throws SenhaInvalidaException {
         this.repository.findByNumeroCartaoAndSenha(numeroCartao, senha).ifPresentOrElse(
-                c -> {
-                    log.info("Senha valida para o cartão {}", numeroCartao);
-                },
+                c -> log.info("Senha valida para o cartão {}", numeroCartao),
                 () -> {
                     String errorMessage = this.mensagensService.getErrorMessage("error.cartao.senha.invalida");
                     log.error(errorMessage);
@@ -97,9 +95,7 @@ public class CartaoServiceImpl implements CartaoService {
         Optional<Cartao> byNumeroCartaoAndSaldoGreaterThan = this.repository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, saldoZero);
 
         byNumeroCartaoAndSaldoGreaterThan.ifPresentOrElse(
-                c -> {
-                    log.info("Saldo encontrado é maior que {} para o cartão de número {}", saldoZero, numeroCartao);
-                },
+                c -> log.info("Saldo encontrado é maior que {} para o cartão de número {}", saldoZero, numeroCartao),
                 () -> {
                     String errorMessage = this.mensagensService.getErrorMessage("error.cartao.saldo.insuficiente");
                     log.error(errorMessage);

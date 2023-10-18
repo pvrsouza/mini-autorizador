@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ComponentScan("br.com.desafiovr.miniautorizador.service")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CartaoServiceImplIntegrationTest {
+class CartaoServiceImplIntegrationTest {
     @Autowired
     private CartaoRepository cartaoRepository;
 
@@ -44,7 +44,7 @@ public class CartaoServiceImplIntegrationTest {
 
 
     @Test
-    public void Deve_ThrowsException_Quando_TentarSalvarCartaoComDadosInvalidos() {
+    void Deve_ThrowsException_Quando_TentarSalvarCartaoComDadosInvalidos() {
 
         CartaoRequestDto invalidCartaoRequest = new CartaoRequestDto();
 
@@ -54,7 +54,7 @@ public class CartaoServiceImplIntegrationTest {
     }
 
     @Test
-    public void Deve_SalvarCartao_Quando_PassarDadosValidos() throws Exception{
+    void Deve_SalvarCartao_Quando_PassarDadosValidos() throws Exception{
 
         CartaoRequestDto cartaoRequestDto = CartaoRequestDto.builder()
                 .numeroCartao("1234567890123456")
@@ -68,7 +68,7 @@ public class CartaoServiceImplIntegrationTest {
     }
 
     @Test
-    public void Deve_InserirSaldoDefault_Quando_CriarCartao() throws Exception{
+    void Deve_InserirSaldoDefault_Quando_CriarCartao() throws Exception{
 
         final BigDecimal saldoInicialParaCartoesNovos = new BigDecimal(500);
 
@@ -88,7 +88,7 @@ public class CartaoServiceImplIntegrationTest {
     }
 
     @Test
-    public void Deve_ThrowsException_Quando_TentarSalvarCartaoExistente() throws Exception {
+    void Deve_ThrowsException_Quando_TentarSalvarCartaoExistente() throws Exception {
         String numeroCartao = "1234567890123456";
 
         // salva o cartão previamente
@@ -106,7 +106,7 @@ public class CartaoServiceImplIntegrationTest {
 
 
     @Test
-    public void Deve_Retornar_SaldoCartaoFormatado() throws Exception {
+    void Deve_Retornar_SaldoCartaoFormatado() throws Exception {
         String numeroCartao = "1234567890123456";
 
         // salva o cartão previamente

@@ -3,7 +3,6 @@ package br.com.desafiovr.miniautorizador.model.entity;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 

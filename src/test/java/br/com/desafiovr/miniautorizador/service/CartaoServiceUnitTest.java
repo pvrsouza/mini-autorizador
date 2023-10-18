@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CartaoServiceUnitTest {
+class CartaoServiceUnitTest {
 
     @InjectMocks
     private CartaoServiceImpl cartaoService;
@@ -38,7 +38,7 @@ public class CartaoServiceUnitTest {
 
 
     @Test
-    public void NaoDeve_IncluirCartao_Quando_PassarObjetoNuloComoParametro() {
+    void NaoDeve_IncluirCartao_Quando_PassarObjetoNuloComoParametro() {
 
         String nullPointerErrorMessage = "O objeto informado não pode ser nulo";
 
@@ -54,13 +54,13 @@ public class CartaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_IncluirCartao() throws Exception{
+    void Deve_IncluirCartao() throws Exception {
         CartaoRequestDto cartaoRequestDto = CartaoRequestDto.builder()
                 .numeroCartao("1234567890123456")
                 .senha("123456")
                 .build();
 
-        Cartao cartaoEntity =  cartaoRequestDto.toEntity();
+        Cartao cartaoEntity = cartaoRequestDto.toEntity();
 
         Cartao cartaoSaved = Cartao.builder()
                 .id(1L)
@@ -79,7 +79,7 @@ public class CartaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_Retornar_SaldoFormatado() throws Exception{
+    void Deve_Retornar_SaldoFormatado() throws Exception {
         String numeroCartao = "1234567890123456";
         String valorFormatado = "500.00";
 
@@ -91,7 +91,7 @@ public class CartaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_RetornarErro_Quando_TentarObterSaldoComParametroVazio() throws Exception{
+    void Deve_RetornarErro_Quando_TentarObterSaldoComParametroVazio() throws Exception {
         String numeroCartao = "";
 
         Cartao cartao = buildCartaoValido(numeroCartao);
@@ -102,7 +102,7 @@ public class CartaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_RetornarErro_Quando_TentarObterSaldoComParametroNulo() throws Exception{
+    void Deve_RetornarErro_Quando_TentarObterSaldoComParametroNulo() throws Exception {
         String numeroCartao = null;
 
         Exception exception = assertThrows(Exception.class,
@@ -112,7 +112,7 @@ public class CartaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_ValidarSenha_Valida(){
+    void Deve_ValidarSenha_Valida() {
         String numeroCartao = "1234567890123456";
         String senha = "123456";
 
@@ -124,7 +124,7 @@ public class CartaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_RetornarErro_Quando_ValidarSenhaInvalida(){
+    void Deve_RetornarErro_Quando_ValidarSenhaInvalida() {
         String numeroCartao = "1234567890123456";
         String senha = "123456";
 
@@ -136,8 +136,9 @@ public class CartaoServiceUnitTest {
 
         assertNotNull(exception);
     }
+
     @Test
-    public void Deve_Validar_SaldoDisponivel(){
+    void Deve_Validar_SaldoDisponivel() {
 
         String numeroCartao = "1234567890123456";
 
@@ -152,23 +153,23 @@ public class CartaoServiceUnitTest {
 
 
     @Test
-    public void Deve_RetornarErro_Quando_CartaoNaoTiverSaldoDisponivel(){
+    void Deve_RetornarErro_Quando_CartaoNaoTiverSaldoDisponivel() {
 
-            String numeroCartao = "1234567890123456";
+        String numeroCartao = "1234567890123456";
 
-            when(cartaoRepository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, BigDecimal.ZERO))
-                    .thenReturn(Optional.empty());
+        when(cartaoRepository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, BigDecimal.ZERO))
+                .thenReturn(Optional.empty());
 
-            SaldoInsuficienteException exception = assertThrows(SaldoInsuficienteException.class,
-                    () -> this.cartaoService.validaSaldoDisponivel(numeroCartao));
+        SaldoInsuficienteException exception = assertThrows(SaldoInsuficienteException.class,
+                () -> this.cartaoService.validaSaldoDisponivel(numeroCartao));
 
-            assertNotNull(exception);
+        assertNotNull(exception);
 
     }
 
 
     @Test
-    public void Deve_AtualizarSaldoCartao(){
+    void Deve_AtualizarSaldoCartao() {
         String numeroCartao = "1234567890123456";
         BigDecimal saldoNovo = new BigDecimal(1000);
         Cartao cartao = buildCartaoValido(numeroCartao);

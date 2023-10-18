@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TransacaoServiceUnitTest {
+class TransacaoServiceUnitTest {
 
     @InjectMocks
     private TransacaoServiceImpl transacaoService;
@@ -36,7 +36,7 @@ public class TransacaoServiceUnitTest {
     ArgumentCaptor<Cartao> cartaoArgumentCaptor;
 
     @Test
-    public void Deve_RegistrarTransacao_Quando_TransacaoValida() throws Exception{
+    void Deve_RegistrarTransacao_Quando_TransacaoValida() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaValida = "123456";
 
@@ -57,7 +57,7 @@ public class TransacaoServiceUnitTest {
 
 
     @Test
-    public void Deve_RegistrarTransacao_Quando_TransacaoInvalida_SenhaIncorreta() throws Exception{
+    void Deve_RegistrarTransacao_Quando_TransacaoInvalida_SenhaIncorreta() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaInvalida = "XXXXXX";
 
@@ -74,7 +74,7 @@ public class TransacaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_RegistrarTransacao_Quando_TransacaoInvalida_SaldoInsuficiente() throws Exception{
+    void Deve_RegistrarTransacao_Quando_TransacaoInvalida_SaldoInsuficiente() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaInvalida = "123456";
 
@@ -91,7 +91,7 @@ public class TransacaoServiceUnitTest {
     }
 
     @Test
-    public void Deve_RegistrarTransacao_Quando_TransacaoInvalida_SaldoCartaoInexistente() throws Exception{
+    void Deve_RegistrarTransacao_Quando_TransacaoInvalida_SaldoCartaoInexistente() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaInvalida = "XXXXXX";
 

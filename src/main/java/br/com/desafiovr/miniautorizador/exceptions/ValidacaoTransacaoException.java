@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class ValidacaoTransacaoException extends RuntimeException {
 
-    private RegrasAutorizacaoTransacao regrasAutorizacaoTransacao;
+    private final RegrasAutorizacaoTransacao regrasAutorizacaoTransacao;
 
     public ValidacaoTransacaoException(String message, RegrasAutorizacaoTransacao regrasAutorizacaoTransacao) {
         super(message);

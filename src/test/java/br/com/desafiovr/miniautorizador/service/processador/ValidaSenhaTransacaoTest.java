@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidaSenhaTransacaoTest {
+ class ValidaSenhaTransacaoTest {
 
 
     @InjectMocks
@@ -34,7 +34,7 @@ public class ValidaSenhaTransacaoTest {
 
 
     @Test
-    public void Deve_ValidarSenhaTransacao() throws Exception {
+     void Deve_ValidarSenhaTransacao() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaInvalida = "123456";
 
@@ -44,7 +44,7 @@ public class ValidaSenhaTransacaoTest {
     }
 
     @Test
-    public void Deve_RetornarErro_Quando_SenhaInvalida() throws Exception {
+     void Deve_RetornarErro_Quando_SenhaInvalida() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaInvalida = "123456";
 
