@@ -1,6 +1,7 @@
 package br.com.desafiovr.miniautorizador.service;
 
 import br.com.desafiovr.miniautorizador.exceptions.CartaoExistenteException;
+import br.com.desafiovr.miniautorizador.locker.LockDistribuido;
 import br.com.desafiovr.miniautorizador.model.dto.input.CartaoRequestDto;
 import br.com.desafiovr.miniautorizador.model.dto.output.CartaoResponseDto;
 import br.com.desafiovr.miniautorizador.model.entity.Cartao;
@@ -35,6 +36,9 @@ class CartaoServiceImplIntegrationTest {
 
     @MockBean
     private MensagensService mensagensService;
+
+    @MockBean
+    private LockDistribuido lockDistribuido;
 
 
     @BeforeEach
