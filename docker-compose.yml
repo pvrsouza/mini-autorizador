@@ -26,15 +26,3 @@ services:
       MYSQL_DATABASE: miniautorizador
       MYSQL_ROOT_PASSWORD:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-
-  mysql-tests:
-    image: mysql:5.7
-    hostname: mysql-tests
-    container_name: mysql-tests
-    restart: always
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_DATABASE: miniautorizador-tests
-      MYSQL_ROOT_PASSWORD:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
