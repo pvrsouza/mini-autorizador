@@ -90,12 +90,11 @@ public class CartaoServiceImpl implements CartaoService {
     }
 
     @Override
-    public void validaSaldoDisponivel(String numeroCartao) throws SaldoInsuficienteException {
-        BigDecimal saldoZero = BigDecimal.ZERO;
-        Optional<Cartao> byNumeroCartaoAndSaldoGreaterThan = this.repository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, saldoZero);
+    public void validaSaldoDisponivel(String numeroCartao, BigDecimal valorOperacao) throws SaldoInsuficienteException {
+        Optional<Cartao> byNumeroCartaoAndSaldoGreaterThan = this.repository.findByNumeroCartaoAndSaldoMaiorQueZeroAndSaldoMaiorQueOperacao(numeroCartao, valorOperacao);
 
         byNumeroCartaoAndSaldoGreaterThan.ifPresentOrElse(
-                c -> log.info("Saldo encontrado é maior que {} para o cartão de número {}", saldoZero, numeroCartao),
+                c -> log.info("Saldo disponível para a operação no cartão de número {}", numeroCartao),
                 () -> {
                     String errorMessage = this.mensagensService.getErrorMessage("error.cartao.saldo.insuficiente");
                     log.error(errorMessage);

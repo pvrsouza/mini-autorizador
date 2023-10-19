@@ -7,7 +7,7 @@ import br.com.desafiovr.miniautorizador.model.dto.input.TransacaoRequestDto;
 import br.com.desafiovr.miniautorizador.service.CartaoService;
 import br.com.desafiovr.miniautorizador.service.MensagensService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service;import java.math.BigDecimal;
 
 @Service
 @Slf4j
@@ -23,8 +23,9 @@ public class ValidaSaldoTransacao implements ValidacaoTransacao {
     public void validar(TransacaoRequestDto request) throws ValidacaoTransacaoException {
         String numeroCartao = request.getNumeroCartao();
         log.info("Validando saldo para o cartão informado {}", numeroCartao);
+        BigDecimal valoroperacao = request.getValor();
         try{
-            this.cartaoService.validaSaldoDisponivel(numeroCartao);
+            this.cartaoService.validaSaldoDisponivel(numeroCartao, valoroperacao);
         }catch (SaldoInsuficienteException e){
             throw new ValidacaoTransacaoException(e.getMessage(), RegrasAutorizacaoTransacao.SALDO_INSUFICIENTE);
         }

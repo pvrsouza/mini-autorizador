@@ -33,19 +33,21 @@ class ValidaSaldoTransacaoTest {
     void Deve_ValidarSaldoTransacao() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaValida = "123456";
+        BigDecimal valorOperacao = BigDecimal.TEN;
 
         this.validaSaldoTransacao.validar(buildTransacaoValida(numeroValido, senhaValida));
 
-        verify(cartaoService).validaSaldoDisponivel(numeroValido);
+        verify(cartaoService).validaSaldoDisponivel(numeroValido, valorOperacao);
     }
 
     @Test
     void Deve_RetornarErro_Quando_CartaoInvalida() throws Exception {
         String numeroValido = "1234567890123456";
         String senhaValida = "123456";
+        BigDecimal valorOperacao = BigDecimal.TEN;
 
         Mockito.doThrow(new SaldoInsuficienteException("Saldo Insuficiente"))
-                .when(cartaoService).validaSaldoDisponivel(numeroValido);
+                .when(cartaoService).validaSaldoDisponivel(numeroValido, valorOperacao);
 
         ValidacaoTransacaoException validacaoTransacaoException = assertThrows(ValidacaoTransacaoException.class,
                 () -> this.validaSaldoTransacao.validar(buildTransacaoValida(numeroValido, senhaValida)));

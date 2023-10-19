@@ -21,7 +21,7 @@ public interface CartaoService {
 
     void validaSenha(String numeroCartao, String senha) throws SenhaInvalidaException;
 
-    void validaSaldoDisponivel(String numeroCartao) throws SaldoInsuficienteException;
+    void validaSaldoDisponivel(String numeroCartao, BigDecimal valorOperacao) throws SaldoInsuficienteException;
 
     Cartao atualizaSaldo(Cartao numeroCartao, BigDecimal resultado);
 }

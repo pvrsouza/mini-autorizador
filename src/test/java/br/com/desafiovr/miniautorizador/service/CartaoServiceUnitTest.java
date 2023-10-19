@@ -144,10 +144,12 @@ class CartaoServiceUnitTest {
 
         Cartao cartaoValido = buildCartaoValido(numeroCartao);
 
-        when(cartaoRepository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, BigDecimal.ZERO))
+        BigDecimal valorOperacao = BigDecimal.TEN;
+
+        when(cartaoRepository.findByNumeroCartaoAndSaldoMaiorQueZeroAndSaldoMaiorQueOperacao(numeroCartao, valorOperacao))
                 .thenReturn(Optional.of(cartaoValido));
 
-        this.cartaoService.validaSaldoDisponivel(numeroCartao);
+        this.cartaoService.validaSaldoDisponivel(numeroCartao, valorOperacao);
 
     }
 
@@ -156,12 +158,14 @@ class CartaoServiceUnitTest {
     void Deve_RetornarErro_Quando_CartaoNaoTiverSaldoDisponivel() {
 
         String numeroCartao = "1234567890123456";
+        BigDecimal valorOperacao = BigDecimal.TEN;
 
-        when(cartaoRepository.findByNumeroCartaoAndSaldoGreaterThan(numeroCartao, BigDecimal.ZERO))
+        when(cartaoRepository.findByNumeroCartaoAndSaldoMaiorQueZeroAndSaldoMaiorQueOperacao(numeroCartao, valorOperacao))
                 .thenReturn(Optional.empty());
 
+
         SaldoInsuficienteException exception = assertThrows(SaldoInsuficienteException.class,
-                () -> this.cartaoService.validaSaldoDisponivel(numeroCartao));
+                () -> this.cartaoService.validaSaldoDisponivel(numeroCartao, valorOperacao));
 
         assertNotNull(exception);
 
